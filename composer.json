@@ -1,5 +1,5 @@
 {
-    "name": "invoiceninja/sdk-php",
+    "name": "dr-ash/sdk-php",
     "description": "PHP SDK to create a custom module for Invoice Ninja",
     "keywords": [
         "invoice"
