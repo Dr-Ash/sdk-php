@@ -12,19 +12,8 @@ class AbstractModel
     public $id;
 
     /**
-     * Create method to bypass models constructors
-     * @return AbstractModel
-     * @throws \ReflectionException
+     * @return array
      */
-    public static function create()
-    {
-        $rc = new \ReflectionClass(get_called_class());
-        return $rc->newInstanceWithoutConstructor();
-    }
-
-    /**
-    * @return array
-    */
     public static function all()
     {
         $url = static::getRoute();
@@ -39,8 +28,8 @@ class AbstractModel
     }
 
     /**
-    * @return \InvoiceNinja\Models\AbstractModel
-    */
+     * @return \InvoiceNinja\Models\AbstractModel
+     */
     public static function find($id)
     {
         $url = static::getRoute() . '/' . $id;
@@ -50,8 +39,8 @@ class AbstractModel
     }
 
     /**
-    * @return \InvoiceNinja\Models\AbstractModel
-    */
+     * @return \InvoiceNinja\Models\AbstractModel
+     */
     public static function findByClientId($id)
     {
         $url = sprintf('%s?client_id=%s', static::getRoute(), $id);
@@ -65,42 +54,6 @@ class AbstractModel
         return $result;
     }
 
-    /**
-    * @return \InvoiceNinja\Models\AbstractModel
-    */
-    public static function findByClientEmail($id)
-    {
-        $url = sprintf('%s?email=%s', static::getRoute(), $id);
-        $data = static::sendRequest($url);
-
-        $result = [];
-        foreach ($data as $item) {
-            $result[] = static::hydrate($item);
-        }
-
-        return $result;
-    }
-    
-    
-
-    /**
-    * @param array $fields Array of fields to filter by. For example, ["invoice_number" => "0123"] or ["email" => "test@example.com"].
-    * @return \InvoiceNinja\Models\AbstractModel
-    */
-    public static function findByCustomQuery($fields)
-    {
-        $query = http_build_query($fields);
-        $url = sprintf('%s?%s', static::getRoute(), $query);
-        $data = static::sendRequest($url);
-
-        $result = [];
-        foreach ($data as $item) {
-            $result[] = static::hydrate($item);
-        }
-
-        return $result;
-    }
-    
     /*
     public static function whereClientId($clientId)
     {
@@ -109,8 +62,8 @@ class AbstractModel
     */
 
     /**
-    * @return \InvoiceNinja\Models\AbstractModel
-    */
+     * @return \InvoiceNinja\Models\AbstractModel
+     */
     public function save()
     {
         $url = static::getRoute();
@@ -142,44 +95,21 @@ class AbstractModel
         return $this->sendAction('delete');
     }
 
+    public function email()
+    {
+        return $this->sendAction('emailInvoice');
+    }
+
+    public function markPaid()
+    {
+        return $this->sendAction('markPaid');
+    }
+
     public static function subscribeCreate($target)
     {
         $url = Config::getUrl() . '/hooks';
         $data = [
             'event' => 'create_' . static::entityType(),
-            'target_url' => $target
-        ];
-
-        static::sendRequest($url, $data, 'POST', true);
-    }
-
-    public static function subscribeUpdate($target)
-    {
-        $url = Config::getUrl() . '/hooks';
-        $data = [
-            'event' => 'update_' . static::entityType(),
-            'target_url' => $target
-        ];
-
-        static::sendRequest($url, $data, 'POST', true);
-    }
-
-    public static function subscribeDelete($target)
-    {
-        $url = Config::getUrl() . '/hooks';
-        $data = [
-            'event' => 'delete_' . static::entityType(),
-            'target_url' => $target
-        ];
-
-        static::sendRequest($url, $data, 'POST', true);
-    }
-
-    public static function subscribeApprove($target)
-    {
-        $url = Config::getUrl() . '/hooks';
-        $data = [
-            'event' => 'approve_' . static::entityType(),
             'target_url' => $target
         ];
 
@@ -230,8 +160,7 @@ class AbstractModel
 
         $options = array_merge(static::$options, [
             'include' => static::$include,
-            'per_page' => Config::getPerPage(),
-            'page' => Config::getPage()
+            'per_page' => Config::getPerPage()
         ]);
 
         $parsedUrl = parse_url($url);
@@ -257,6 +186,7 @@ class AbstractModel
         curl_setopt_array($curl, $opts);
         $response = curl_exec($curl);
 
+//        dd($response);
         if ($raw) {
             return $response;
         } else {
@@ -268,5 +198,6 @@ class AbstractModel
             }
         }
     }
+
 
 }
