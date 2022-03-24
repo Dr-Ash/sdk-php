@@ -1,5 +1,5 @@
 {
-    "name": "invoiceninja/sdk-php",
+    "name": "dr-ash/sdk-php",
     "description": "The Invoice Ninja v5 PHP SDK",
     "type": "library",
     "license": "MIT",
