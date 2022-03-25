@@ -2,5 +2,5 @@
 
 class Ticket extends AbstractModel
 {
-    public static $route = 'tickets';
+    public static $route = 'ticketts';
 }
